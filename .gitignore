@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+.venv/
+# build outputs (run make)
+myParser
+sql_compiler
+lexer.yy.c
+*.o

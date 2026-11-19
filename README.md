@@ -10,6 +10,59 @@ This repository contains two compiler-related coursework projects:
 The repository also includes the reports and screenshots associated with the
 assignments.
 
+## Demo
+
+### SQL compiler (version 3)
+
+Given this input:
+
+```sql
+CREATE TABLE suppliers (supplier_id INT, company VARCHAR(60));
+CREATE TABLE parts (part_id INT, description VARCHAR(100), supplier_id INT);
+
+SELECT suppliers.company
+FROM suppliers
+JOIN nonexistent ON suppliers.supplier_id = nonexistent.supplier_id;
+
+SELECT parts.description
+FROM parts
+JOIN suppliers ON parts.supplier_id = suppliers.missing_col;
+```
+
+the parser accepts the syntax and the semantic checks catch both mistakes:
+
+```text
+$ make && ./myParser tests/test_join_invalid.sql
+Semantic error: unknown table 'nonexistent'.
+Semantic error: unknown table 'nonexistent'.
+Semantic error: column 'missing_col' not found in table 'suppliers'.
+Syntactic analysis successful.
+```
+
+Type checking works on `WHERE ... IN (...)`, comparisons, `GROUP BY` and `ORDER BY`:
+
+```text
+$ ./myParser tests/test_new_checks_invalid.sql
+Semantic error: type mismatch in IN list — column 'items.item_id' is INT, but literal is VARCHAR.
+Semantic error: type mismatch in IN list — column 'items.name' is VARCHAR, but literal is INT.
+Semantic error: column 'nonexistent_col' not found in any active table.
+Semantic error: column 'fake_col' not found in any active table.
+Semantic error: type mismatch — column 'items.item_id' is INT, but literal is FLOAT.
+Syntactic analysis successful.
+```
+
+(Abridged: the real output repeats an error once for each offending literal.)
+
+### Course recommendation app
+
+| Main window: collected courses, filters and the top-3 recommender | Difficulty chart |
+| --- | --- |
+| ![Tkinter window with a table of courses from Coursera, iTunes, GitHub and W3Schools](Python/1115510_1115507/Python/Screenshots/screenshot1.png) | ![Pie chart of beginner versus intermediate courses](Python/1115510_1115507/Python/Screenshots/screenshot4.png) |
+
+The interface is in Greek: *Συλλογή Δεδομένων* collects data, *Ανανέωση Πίνακα* reloads the
+table, *Εξαγωγή CSV* exports, and *Βρες Top 3* finds the three best courses for the chosen
+filters.
+
 ## FlexBison: SQL compiler
 
 The [`FlexBison/FlexBison/`](FlexBison/FlexBison/) directory contains three
@@ -71,8 +124,7 @@ outputs:
 make clean
 ```
 
-The checked-in generated C files and existing `sql_compiler` binaries are
-provided as coursework artifacts; running `make` is the reproducible way to
+The checked-in generated C files are provided as coursework artifacts; running `make` is the reproducible way to
 regenerate and build the parser from `lexer.l` and `parser.y`.
 
 ## Python: course recommendation application
